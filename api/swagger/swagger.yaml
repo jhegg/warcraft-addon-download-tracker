@@ -1,0 +1,178 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Warcraft Addon Download Tracker
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /addons:
+    x-swagger-router-controller: addons
+    get:
+      summary: Returns the list of all addons that have download counts.
+      description: Get the list of addons
+      operationId: getAddons
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/addons"
+  /addons/{addonName}:
+    x-swagger-router-controller: addons
+    get:
+      summary: Returns a specific addon
+      description: Gets a specific addon
+      operationId: getAddon
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/addon"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      summary: Creates a new addon
+      description: Creates an addon
+      operationId: createAddon
+      parameters:
+        - name: urls
+          in: body
+          description: The addon URLs
+          required: true
+          schema:
+            $ref: '#/definitions/addon_post'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/addon"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    parameters:
+      - $ref: "#/parameters/addonNameParam"
+  /addons/{addonName}/downloads:
+    x-swagger-router-controller: addons
+    get:
+      summary: Returns download information for {addonName}
+      description: Get the list of addons
+      operationId: getDownloadsForAddon
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/addonDownloads"
+    post:
+      summary: Adds a new download count for {addonName}
+      operationId: addDownloadsForAddon
+      parameters:
+        - name: downloads
+          in: body
+          description: The new download count and timestamp for {addonName}
+          required: true
+          schema:
+            $ref: '#/definitions/addon_downloads_post'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/addon_downloads_post_response"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    parameters:
+      - $ref: "#/parameters/addonNameParam"
+parameters:
+  addonNameParam:
+    name: addonName
+    in: path
+    required: true
+    type: string
+    description: The name of an addon to retrieve data from
+definitions:
+  addon:
+    type: object
+    required:
+      - addonName
+    properties:
+      addonName:
+        type: string
+      curseForgeUrl:
+        type: string
+      wowInterfaceUrl:
+        type: string
+  addon_post:
+    type: object
+    required:
+      - curseForgeUrl
+      - wowInterfaceUrl
+    properties:
+      curseForgeUrl:
+        type: string
+      wowInterfaceUrl:
+        type: string
+  addon_downloads_post:
+    type: object
+    required:
+      - count
+    properties:
+      count:
+        type: integer
+        format: int32
+  addons:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  addonDownloads:
+    required:
+      - addonName
+    type: object
+    properties:
+      addonName:
+        type: string
+      downloads:
+        type: array
+        items:
+          - $ref: "#/definitions/download_count"
+  download_count:
+    type: object
+    required:
+      - count
+      - timestamp
+    properties:
+      count:
+        type: integer
+        format: int32
+      timestamp:
+        type: string
+        format: date-time
+  addon_downloads_post_response:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
