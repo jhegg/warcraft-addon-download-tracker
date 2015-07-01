@@ -8,8 +8,8 @@
   "license": "MIT",
   "main": "app.js",
   "dependencies": {
-    "restify": "^3.0.1",
-    "swagger-restify-mw": "0.0.x"
+    "express": "^4.12.3",
+    "swagger-express-mw": "0.0.x"
   },
   "devDependencies": {
     "should": "^5.2.0",
