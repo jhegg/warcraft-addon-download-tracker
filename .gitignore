@@ -36,3 +36,6 @@ config/runtime.yaml
 *.iml
 *.ipr
 *.iws
+
+# Heroku
+/*.env
