@@ -55,11 +55,20 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/addon_post'
+        - name: api-token
+          in: header
+          description: The API token for authorization
+          required: true
+          type: string
       responses:
         200:
           description: Success
           schema:
             $ref: "#/definitions/addon"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -87,11 +96,20 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/addon_downloads_post'
+        - name: api-token
+          in: header
+          description: The API token for authorization
+          required: true
+          type: string
       responses:
         200:
           description: Success
           schema:
             $ref: "#/definitions/addon_downloads_post_response"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
         default:
           description: Error
           schema:
@@ -171,8 +189,6 @@ definitions:
       message:
         type: string
   ErrorResponse:
-    required:
-      - message
     properties:
       message:
         type: string

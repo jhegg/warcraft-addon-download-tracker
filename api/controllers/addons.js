@@ -28,7 +28,6 @@ function getAddon(req, res) {
 }
 
 function createAddon(req, res) {
-  // todo add api key validation
   var name = req.swagger.params.addonName.value;
   var curseForgeUrl = req.swagger.params.urls.value.curseForgeUrl;
   var wowInterfaceUrl = req.swagger.params.urls.value.wowInterfaceUrl;
@@ -49,7 +48,6 @@ function getDownloadsForAddon(req, res) {
 }
 
 function addDownloadsForAddon(req, res) {
-  // todo add api key validation
   var name = req.swagger.params.addonName.value;
   // lookup addon by 'name'
   var count = req.swagger.params.downloads.value.count;

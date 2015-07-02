@@ -15,6 +15,21 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/static/index.html')
 });
 
+var allowedContentType = /^application\/json(?:[\s;]|$)/i;
+app.use(function(req, res, next) {
+  if (req.method === 'POST' && !allowedContentType.test(req.headers['content-type'])) {
+    return res.status(406).json('The only allowed Content-Type is: application/json');
+  }
+  next();
+});
+
+app.use(function(req, res, next) {
+  if (req.method === 'POST' && (req.headers['api-token'] != process.env.API_TOKEN)) {
+    return res.status(401).json('401 Unauthorized');
+  }
+  next();
+});
+
 SwaggerExpress.create(config, function(err, swaggerExpress) {
   if (err) { throw err; }
 
@@ -29,3 +44,12 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
 
 // catch-all route for static resources
 app.use('/', express.static(__dirname + '/static'));
+
+app.use(errorHandler);
+
+// todo: I don't understand why this is necessary for proper error rendering
+function errorHandler(err, req, res, next) {
+  if (err) {
+    res.status(res.statusCode).json(err.message);
+  }
+}
