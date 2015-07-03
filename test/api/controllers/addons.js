@@ -11,12 +11,12 @@ var databaseStub = {
   lookupAddons: function (res, callback) {
     res.json(['addon1', 'addon2']);
   },
-  lookupAddon: function (name) {
-    return {
+  lookupAddon: function (name, res, callback) {
+    res.json({
       addonName: name,
       curseForgeUrl: 'http://curseforge.com/' + name,
       wowInterfaceUrl: 'http://wowinterface.com/author'
-    }
+    });
   },
   newAddon: function (name, curseForgeUrl, wowInterfaceUrl, res, callback) {
     res.json({

@@ -18,26 +18,45 @@ function getAddons(req, res) {
 }
 
 function getAddonsCallback(err, res, results) {
-  if (err) throw err;
-  if (!results || results.empty) {
-    res.json({});
-  } else {
-    var addonNames = results.map(function (addon) { return addon.addonName } );
-    res.json(addonNames);
+  if (err) {
+    console.error('Error in addons#getAddonsCallback: ' + err);
+    return res.status(500).json('An error occurred while fetching addons, sorry.');
   }
+
+  if (!results || results.length === 0) {
+    res.json({});
+  }
+
+  var addonNames = results.map(function (addon) {
+    return addon.addonName
+  });
+  res.json(addonNames);
 }
 
 function getAddon(req, res) {
   var name = req.swagger.params.addonName.value;
-  // todo what other validation should be done on name? or is swagger handling that for us?
-  res.json(database.lookupAddon(name));
+  database.lookupAddon(name, res, getAddonCallback);
+}
+
+function getAddonCallback(err, res, results) {
+  if (err) {
+    console.error('Error in addons#getAddonCallback: ' + err);
+    return res.status(500).json('An error occurred while fetching the addon, sorry.');
+  }
+
+  if (!results || results.length === 0) {
+    return res.status(404).json('The requested addon could not be found.');
+  }
+
+  var addon = results[0];
+  delete addon['_id'];
+  res.json(addon);
 }
 
 function createAddon(req, res) {
   var name = req.swagger.params.addonName.value;
   var curseForgeUrl = req.swagger.params.urls.value.curseForgeUrl;
   var wowInterfaceUrl = req.swagger.params.urls.value.wowInterfaceUrl;
-  // todo validation
   database.newAddon(name, curseForgeUrl, wowInterfaceUrl, res, createAddonCallback);
 }
 

@@ -29,7 +29,7 @@ function lookupAddons(res, callback) {
   MongoClient.connect(mongoUrl, function (err, db) {
     assert.equal(null, err);
     db.collection(mongoCollection).find(
-      {},
+      {'addonName': { $exists: true, $ne: null}},
       {'addonName': true},
       {'sort': 'addonName'}
     ).toArray(
@@ -40,15 +40,17 @@ function lookupAddons(res, callback) {
   });
 }
 
-function lookupAddon(addonName) {
-  // todo do the mongo lookup
-  // todo for safety, should I #lookupAddons, and then iterate and string compare to find a match, to
-  //        prevent malicious input?
-  return {
-    addonName: addonName,
-    curseForgeUrl: 'http://curseforge.com/' + addonName,
-    wowInterfaceUrl: 'http://wowinterface.com/author'
-  }
+function lookupAddon(addonName, res, callback) {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    db.collection(mongoCollection).find(
+      {'addonName': addonName}
+    ).toArray(
+      function (err, results) {
+        callback(err, res, results);
+      }
+    );
+  });
 }
 
 function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
