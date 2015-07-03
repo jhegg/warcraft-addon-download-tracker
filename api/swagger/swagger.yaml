@@ -153,6 +153,7 @@ definitions:
       count:
         type: integer
         format: int32
+        minimum: 0
   addons:
     required:
       - message
@@ -184,10 +185,19 @@ definitions:
         format: date-time
   addon_downloads_post_response:
     required:
-      - message
+      - addonName
+      - count
+      - timestamp
     properties:
-      message:
+      addonName:
         type: string
+      count:
+        type: integer
+        format: int32
+        minimum: 0
+      timestamp:
+        type: string
+        format: date-time
   ErrorResponse:
     properties:
       message:
