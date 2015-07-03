@@ -10,8 +10,20 @@ module.exports = {
   lookupAddon: lookupAddon,
   newAddon: newAddon,
   lookupDownloadsForAddon: lookupDownloadsForAddon,
-  newDownloadCountForAddon: newDownloadCountForAddon
+  newDownloadCountForAddon: newDownloadCountForAddon,
+  createConstraintsOnStartup: createConstraints
 };
+
+function createConstraints() {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    var collection = db.collection(mongoCollection);
+    collection.createIndex('addonName', {unique: true}, function (err, indexName) {
+      if (err) console.error('Error while creating addonNameUnique index: ' + err);
+      console.log('Created index: ' + indexName);
+    });
+  });
+}
 
 function lookupAddons(res, callback) {
   MongoClient.connect(mongoUrl, function (err, db) {
@@ -39,14 +51,22 @@ function lookupAddon(addonName) {
   }
 }
 
-function newAddon(addonName, curseForgeUrl, wowInterfaceUrl) {
-  // todo do the mongo lookup
-  // todo what sort of validation should I do here?
-  return {
-    addonName: addonName,
-    curseForgeUrl: curseForgeUrl,
-    wowInterfaceUrl: wowInterfaceUrl
-  };
+function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    var collection = db.collection(mongoCollection);
+    collection.insert(
+      {
+        addonName: addonName,
+        curseForgeUrl: curseForgeUrl,
+        wowInterfaceUrl: wowInterfaceUrl
+      },
+      { w: 1 },
+      function (err, results) {
+        callback(err, res, addonName, results);
+      }
+    );
+  });
 }
 
 function lookupDownloadsForAddon(addonName) {

@@ -1,6 +1,9 @@
 'use strict';
 
+var util = require('util');
 var database = require('../helpers/database');
+
+database.createConstraintsOnStartup();
 
 module.exports = {
   getAddons: getAddons,
@@ -15,7 +18,7 @@ function getAddons(req, res) {
 }
 
 function getAddonsCallback(err, res, results) {
-  if (err) return next(err);
+  if (err) throw err;
   if (!results || results.empty) {
     res.json({});
   } else {
@@ -35,7 +38,17 @@ function createAddon(req, res) {
   var curseForgeUrl = req.swagger.params.urls.value.curseForgeUrl;
   var wowInterfaceUrl = req.swagger.params.urls.value.wowInterfaceUrl;
   // todo validation
-  res.json(database.newAddon(name, curseForgeUrl, wowInterfaceUrl));
+  database.newAddon(name, curseForgeUrl, wowInterfaceUrl, res, createAddonCallback);
+}
+
+function createAddonCallback(err, res, name, results) {
+  if (err) {
+    console.error('Error in addons#createAddonCallback: ' + err);
+    return res.status(400).json(util.format('The specified addon already exists: %s', name));
+  }
+  var addon = results['ops'][0];
+  delete addon['_id'];
+  res.json(addon);
 }
 
 function getDownloadsForAddon(req, res) {

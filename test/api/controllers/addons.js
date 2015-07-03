@@ -7,6 +7,7 @@ process.env.MONGOLAB_URI = 'mongodb://localhost:27017/testAddonDownloadTracker';
 process.env.A127_ENV = 'test';
 
 var databaseStub = {
+  createConstraintsOnStartup: function() {},
   lookupAddons: function (res, callback) {
     res.json(['addon1', 'addon2']);
   },
@@ -17,12 +18,12 @@ var databaseStub = {
       wowInterfaceUrl: 'http://wowinterface.com/author'
     }
   },
-  newAddon: function (name, curseForgeUrl, wowInterfaceUrl) {
-    return {
+  newAddon: function (name, curseForgeUrl, wowInterfaceUrl, res, callback) {
+    res.json({
       addonName: name,
       curseForgeUrl: curseForgeUrl,
       wowInterfaceUrl: wowInterfaceUrl
-    }
+    });
   },
   lookupDownloadsForAddon: function (name) {
     var downloads = [];
