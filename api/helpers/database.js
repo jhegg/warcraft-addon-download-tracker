@@ -1,7 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var util = require('util');
 var MongoClient = require('mongodb').MongoClient;
 var mongoCollection = 'addons';
 var mongoUrl = process.env.MONGOLAB_URI;
