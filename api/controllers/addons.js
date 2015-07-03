@@ -11,8 +11,17 @@ module.exports = {
 };
 
 function getAddons(req, res) {
-  var addons = database.lookupAddons();
-  res.json(addons);
+  database.lookupAddons(res, getAddonsCallback);
+}
+
+function getAddonsCallback(err, res, results) {
+  if (err) return next(err);
+  if (!results || results.empty) {
+    res.json({});
+  } else {
+    var addonNames = results.map(function (addon) { return addon.addonName } );
+    res.json(addonNames);
+  }
 }
 
 function getAddon(req, res) {

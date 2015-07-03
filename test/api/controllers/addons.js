@@ -7,8 +7,8 @@ process.env.MONGOLAB_URI = 'mongodb://localhost:27017/testAddonDownloadTracker';
 process.env.A127_ENV = 'test';
 
 var databaseStub = {
-  lookupAddons: function () {
-    return ['addon1', 'addon2']
+  lookupAddons: function (res, callback) {
+    res.json(['addon1', 'addon2']);
   },
   lookupAddon: function (name) {
     return {

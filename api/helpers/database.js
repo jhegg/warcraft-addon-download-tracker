@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var util = require('util');
 var MongoClient = require('mongodb').MongoClient;
 var mongoCollection = 'addons';
@@ -13,9 +14,19 @@ module.exports = {
   newDownloadCountForAddon: newDownloadCountForAddon
 };
 
-function lookupAddons() {
-  // todo do the mongo lookup
-  return ['addon1111', 'addon42'];
+function lookupAddons(res, callback) {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    db.collection(mongoCollection).find(
+      {},
+      {'addonName': true},
+      {'sort': 'addonName'}
+    ).toArray(
+      function (err, results) {
+        callback(err, res, results);
+      }
+    );
+  });
 }
 
 function lookupAddon(addonName) {
