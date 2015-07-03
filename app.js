@@ -23,8 +23,12 @@ app.use(function(req, res, next) {
   next();
 });
 
+var apiToken = process.env.API_TOKEN;
+if (!apiToken) {
+  throw new Error('The "API_TOKEN" environment variable must be set!');
+}
 app.use(function(req, res, next) {
-  if (req.method === 'POST' && (req.headers['api-token'] != process.env.API_TOKEN)) {
+  if (req.method === 'POST' && (req.headers['api-token'] != apiToken)) {
     return res.status(401).json('401 Unauthorized');
   }
   next();
