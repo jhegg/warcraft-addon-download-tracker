@@ -50,6 +50,15 @@ var server = require('../../../app');
 describe('controllers', function () {
   describe('addons', function () {
 
+    describe('GET /', function() {
+      it('should return index.html', function (done) {
+        request(server)
+          .get('/')
+          .expect('Content-Type', /html/)
+          .expect(200, done);
+      });
+    });
+
     describe('GET /addons', function () {
       it('should give 200 and return an array', function (done) {
         request(server)
