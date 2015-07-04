@@ -29,7 +29,7 @@ function getAddonsCallback(err, res, results) {
   }
 
   if (!results || results.length === 0) {
-    res.json({});
+    res.json([]);
     return;
   }
 

@@ -159,8 +159,6 @@ definitions:
         format: int32
         minimum: 0
   addons:
-    required:
-      - message
     properties:
       message:
         type: string
