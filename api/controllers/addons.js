@@ -9,6 +9,7 @@ module.exports = {
   getAddons: getAddons,
   getAddonsCallback: getAddonsCallback, // visible for testing
   getAddon: getAddon,
+  getAddonCallback: getAddonCallback, // visible for testing
   createAddon: createAddon,
   getDownloadsForAddon: getDownloadsForAddon,
   addDownloadsForAddon: addDownloadsForAddon

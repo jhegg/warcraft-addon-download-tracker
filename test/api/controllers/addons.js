@@ -131,6 +131,54 @@ describe('controllers', function () {
       });
     });
 
+    describe('Callback for GET /addons/foobar', function () {
+      it('Should throw 500 if error is set', function (done) {
+        var err = 'An error!';
+        var res = {
+          status: function(statusCode) {
+            statusCode.should.be.exactly(500);
+            return this;
+          },
+          json: function(message) {
+            message.should.be.exactly('An error occurred while fetching the addon, sorry.');
+            return this;
+          }
+        };
+        addons.getAddonCallback(err, res, null);
+        done();
+      });
+
+      it('Should give a 404 if results are empty', function (done) {
+        var results = [];
+        var res = {
+          status: function(statusCode) {
+            statusCode.should.be.exactly(404);
+            return this;
+          },
+          json: function(message) {
+            message.should.be.exactly('The requested addon could not be found.');
+            return this;
+          }
+        };
+        addons.getAddonCallback(null, res, results);
+        done();
+      });
+
+      it('Should give a JSON object with addonName if at least one result', function (done) {
+        var results = [{addonName: 'myAddon', _id: 27, curseForgeUrl: 'foo', wowInterfaceUrl: 'bar'}];
+        var res = {
+          json: function(message) {
+            should.exist(message);
+            (message).should.have.length(1);
+            (message).should.match(['myAddon']);
+            return this;
+          }
+        };
+        addons.getAddonsCallback(null, res, results);
+        done();
+      });
+    });
+
     describe('POST /addons/foo', function () {
       it('should give 401 when missing api-token', function (done) {
         request(server)
