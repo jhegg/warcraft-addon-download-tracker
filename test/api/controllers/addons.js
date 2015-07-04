@@ -68,6 +68,52 @@ describe('controllers', function () {
       });
     });
 
+    describe('Callback for GET /addons', function () {
+      it('Should throw 500 if error is set', function (done) {
+        var err = 'An error!';
+        var res = {
+          status: function(statusCode) {
+            statusCode.should.be.exactly(500);
+            return this;
+          },
+          json: function(message) {
+            message.should.be.exactly('An error occurred while fetching addons, sorry.');
+            return this;
+          }
+        };
+        addons.getAddonsCallback(err, res, null);
+        done();
+      });
+
+      it('Should give an empty JSON object if results are empty', function (done) {
+        var results = [];
+        var res = {
+          json: function(message) {
+            should.exist(message);
+            (message).should.have.keys();
+            (message).should.match({});
+            return this;
+          }
+        };
+        addons.getAddonsCallback(null, res, results);
+        done();
+      });
+
+      it('Should give a JSON object with addonName if at least one result', function (done) {
+        var results = [{addonName: 'myAddon', _id: 27, curseForgeUrl: 'foo', wowInterfaceUrl: 'bar'}];
+        var res = {
+          json: function(message) {
+            should.exist(message);
+            (message).should.have.length(1);
+            (message).should.match(['myAddon']);
+            return this;
+          }
+        };
+        addons.getAddonsCallback(null, res, results);
+        done();
+      });
+    });
+
     describe('GET /addons/foobar', function () {
       it('should give 200 and return an addon', function (done) {
         request(server)

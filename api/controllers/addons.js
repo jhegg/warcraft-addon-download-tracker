@@ -7,6 +7,7 @@ database.createConstraintsOnStartup();
 
 module.exports = {
   getAddons: getAddons,
+  getAddonsCallback: getAddonsCallback, // visible for testing
   getAddon: getAddon,
   createAddon: createAddon,
   getDownloadsForAddon: getDownloadsForAddon,
