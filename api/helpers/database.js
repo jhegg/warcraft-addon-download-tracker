@@ -29,7 +29,7 @@ function lookupAddons(res, callback) {
   MongoClient.connect(mongoUrl, function (err, db) {
     assert.equal(null, err);
     db.collection(mongoCollection).find(
-      {'addonName': { $exists: true, $ne: null}},
+      {'addonName': {$exists: true, $ne: null}},
       {'addonName': true},
       {'sort': 'addonName'}
     ).toArray(
@@ -63,7 +63,7 @@ function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
         curseForgeUrl: curseForgeUrl,
         wowInterfaceUrl: wowInterfaceUrl
       },
-      { w: 1 },
+      {w: 1},
       function (err, results) {
         callback(err, res, addonName, results);
       }
@@ -71,10 +71,35 @@ function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
   });
 }
 
-function lookupDownloadsForAddon(addonName) {
+function lookupDownloadsForAddon(addonName, res, callback) {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    var collection = db.collection(mongoCollection);
+    collection.find(
+      {'addonName': addonName}
+    ).toArray(
+      function (err, results) {
+        if (err) {
+          callback(err, res, addonName, results);
+          return;
+        }
+        if (results.length === 0) {
+          callback(err, res, addonName, results);
+          return;
+        }
+        var addonId = results[0]._id;
+        collection.find(
+          {'addon_id': addonId}
+        ).toArray(
+          function (err, results) {
+            callback(err, res, addonName, results);
+          }
+        );
+      }
+    );
+  });
+
   var downloads = [];
-  // todo do the mongo lookup
-  // todo what sort of validation should I do here?
   downloads.push({count: 1, timestamp: new Date()});
   downloads.push({count: 2, timestamp: new Date()});
   downloads.push({count: 3, timestamp: new Date()});
@@ -102,7 +127,7 @@ function newDownloadCountForAddon(addonName, count, timestamp, res, callback) {
             count: count,
             timestamp: timestamp
           },
-          { w: 1 },
+          {w: 1},
           function (err, results) {
             callback(err, res, addonName, count, timestamp, results);
           }

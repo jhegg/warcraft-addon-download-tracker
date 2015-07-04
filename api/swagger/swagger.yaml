@@ -86,6 +86,10 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/addonDownloads"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     post:
       summary: Adds a new download count for {addonName}
       operationId: addDownloadsForAddon

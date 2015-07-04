@@ -26,14 +26,14 @@ var databaseStub = {
       wowInterfaceUrl: wowInterfaceUrl
     });
   },
-  lookupDownloadsForAddon: function (name) {
+  lookupDownloadsForAddon: function (addonName, res, callback) {
     var downloads = [];
     downloads.push({count: 1, timestamp: new Date()});
     downloads.push({count: 2, timestamp: new Date()});
-    return {
-      addonName: name,
+    res.json({
+      addonName: addonName,
       downloads: downloads
-    };
+    });
   },
   newDownloadCountForAddon: function (name, count, timestamp, res, callback) {
     res.json({
@@ -50,7 +50,7 @@ var server = require('../../../app');
 describe('controllers', function () {
   describe('addons', function () {
 
-    describe('GET /', function() {
+    describe('GET /', function () {
       it('should return index.html', function (done) {
         request(server)
           .get('/')
@@ -254,8 +254,6 @@ describe('controllers', function () {
           .send()
           .expect(400, done);
       });
-
-      // todo add more tests around bad input, invalid addonNames and URLs, to test input filtering.
     });
 
     describe('Callback for POST /addons/foobar', function () {
@@ -310,6 +308,59 @@ describe('controllers', function () {
             downloadCount['count'].should.be.an.instanceOf(Number);
             done();
           });
+      });
+    });
+
+    describe('Callback for GET /addons/foobar/downloads', function () {
+      it('Should throw 500 if error is set', function (done) {
+        var err = 'An error!';
+        var res = {
+          status: function (statusCode) {
+            statusCode.should.be.exactly(500);
+            return this;
+          },
+          json: function (message) {
+            message.should.be.exactly('An error occurred while fetching the addon download count, sorry.');
+            return this;
+          }
+        };
+        addons.getDownloadsForAddonCallback(err, res, null);
+        done();
+      });
+
+      it('Should give a 404 if results are empty', function (done) {
+        var results = [];
+        var res = {
+          status: function (statusCode) {
+            statusCode.should.be.exactly(404);
+            return this;
+          },
+          json: function (message) {
+            message.should.be.exactly('No results were found for the addon download count, sorry.');
+            return this;
+          }
+        };
+        addons.getDownloadsForAddonCallback(null, res, results);
+        done();
+      });
+
+      it('Should give a JSON object with addonName if at least one result', function (done) {
+        var results = [
+          {addon_id: 12, count: 1, timestamp: 'foo'},
+          {addon_id: 12, count: 2, timestamp: 'foo+1'}
+        ];
+        var res = {
+          json: function (message) {
+            should.exist(message);
+            message.should.have.keys('addonName', 'downloads');
+            message.addonName.should.be.exactly('myAddon');
+            message.downloads.should.be.length(2);
+            message.downloads[0].should.have.keys('count', 'timestamp');
+            return this;
+          }
+        };
+        addons.getDownloadsForAddonCallback(null, res, 'myAddon', results);
+        done();
       });
     });
 

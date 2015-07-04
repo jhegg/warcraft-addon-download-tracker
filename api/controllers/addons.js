@@ -13,6 +13,7 @@ module.exports = {
   createAddon: createAddon,
   createAddonCallback: createAddonCallback, // visible for testing
   getDownloadsForAddon: getDownloadsForAddon,
+  getDownloadsForAddonCallback: getDownloadsForAddonCallback, // visible for testing
   addDownloadsForAddon: addDownloadsForAddon,
   addDownloadsForAddonCallback: addDownloadsForAddonCallback // visible for testing
 };
@@ -29,6 +30,7 @@ function getAddonsCallback(err, res, results) {
 
   if (!results || results.length === 0) {
     res.json({});
+    return;
   }
 
   var addonNames = results.map(function (addon) {
@@ -76,8 +78,27 @@ function createAddonCallback(err, res, name, results) {
 
 function getDownloadsForAddon(req, res) {
   var name = req.swagger.params.addonName.value;
-  // todo validation
-  res.json(database.lookupDownloadsForAddon(name));
+  database.lookupDownloadsForAddon(name, res, getDownloadsForAddonCallback);
+}
+
+function getDownloadsForAddonCallback(err, res, addonName, results) {
+  if (err) {
+    console.error('Error in addons#getDownloadsForAddonCallback: ' + err);
+    return res.status(500).json('An error occurred while fetching the addon download count, sorry.');
+  }
+
+  if (!results || results.length === 0) {
+    return res.status(404).json('No results were found for the addon download count, sorry.');
+  }
+
+  var counts = results.map(function (results) {
+    return {
+      count: results.count,
+      timestamp: results.timestamp
+    }
+  });
+
+  res.json({addonName: addonName, downloads: counts});
 }
 
 function addDownloadsForAddon(req, res) {
