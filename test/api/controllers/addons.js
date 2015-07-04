@@ -35,12 +35,12 @@ var databaseStub = {
       downloads: downloads
     };
   },
-  newDownloadCountForAddon: function (name, count, timestamp) {
-    return {
+  newDownloadCountForAddon: function (name, count, timestamp, res, callback) {
+    res.json({
       addonName: name,
       count: count,
       timestamp: timestamp
-    }
+    });
   }
 };
 
@@ -375,6 +375,37 @@ describe('controllers', function () {
           .set('api-token', superSecretToken)
           .send()
           .expect(400, done);
+      });
+    });
+
+    describe('Callback for POST /addons/foobar/downloads', function () {
+      it('Should throw 500 if error is set', function (done) {
+        var res = {
+          status: function (statusCode) {
+            statusCode.should.be.exactly(500);
+            return this;
+          },
+          json: function (message) {
+            message.should.be.exactly('An error occurred while posting download counts for foobar, sorry.');
+            return this;
+          }
+        };
+        addons.addDownloadsForAddonCallback('An error!', res, 'foobar', null, null, null);
+        done();
+      });
+
+      it('Should give a JSON object without _id if a successful result', function (done) {
+        var res = {
+          json: function (addon) {
+            should.exist(addon);
+            addon.should.have.keys('addonName', 'count', 'timestamp');
+            addon.addonName.should.be.exactly('foobar');
+            addon.count.should.be.exactly(42);
+            return this;
+          }
+        };
+        addons.addDownloadsForAddonCallback(null, res, 'foobar', 42, 'now');
+        done();
       });
     });
   });

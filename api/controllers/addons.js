@@ -13,7 +13,8 @@ module.exports = {
   createAddon: createAddon,
   createAddonCallback: createAddonCallback, // visible for testing
   getDownloadsForAddon: getDownloadsForAddon,
-  addDownloadsForAddon: addDownloadsForAddon
+  addDownloadsForAddon: addDownloadsForAddon,
+  addDownloadsForAddonCallback: addDownloadsForAddonCallback // visible for testing
 };
 
 function getAddons(req, res) {
@@ -82,7 +83,21 @@ function getDownloadsForAddon(req, res) {
 function addDownloadsForAddon(req, res) {
   var name = req.swagger.params.addonName.value;
   var count = req.swagger.params.downloads.value.count;
-  // todo validation
   var timestamp = new Date();
-  res.json(database.newDownloadCountForAddon(name, count, timestamp));
+  database.newDownloadCountForAddon(name, count, timestamp, res, addDownloadsForAddonCallback);
+}
+
+function addDownloadsForAddonCallback(err, res, name, count, timestamp, results) {
+  if (err) {
+    console.error('Error in addons#addDownloadsForAddonCallback: ' + err);
+    return res.status(500).json(util.format(
+      'An error occurred while posting download counts for %s, sorry.',
+      name));
+  }
+  var output = {
+    addonName: name,
+    count: count,
+    timestamp: timestamp
+  };
+  res.json(output);
 }

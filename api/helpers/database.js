@@ -18,7 +18,7 @@ function createConstraints() {
   MongoClient.connect(mongoUrl, function (err, db) {
     assert.equal(null, err);
     var collection = db.collection(mongoCollection);
-    collection.createIndex('addonName', {unique: true}, function (err, indexName) {
+    collection.createIndex('addonName', {unique: true, sparse: true}, function (err, indexName) {
       if (err) console.error('Error while creating addonNameUnique index: ' + err);
       console.log('Created index: ' + indexName);
     });
@@ -84,12 +84,30 @@ function lookupDownloadsForAddon(addonName) {
   };
 }
 
-function newDownloadCountForAddon(addonName, count, timestamp) {
-  // todo use mongo to lookup addonName to verify it exists
-  // todo use mongo to insert a new record, with count and timestamp
-  return {
-    addonName: addonName,
-    count: count,
-    timestamp: timestamp
-  }
+function newDownloadCountForAddon(addonName, count, timestamp, res, callback) {
+  MongoClient.connect(mongoUrl, function (err, db) {
+    assert.equal(null, err);
+    var collection = db.collection(mongoCollection);
+    collection.find(
+      {'addonName': addonName}
+    ).toArray(
+      function (err, results) {
+        if (err) {
+          callback(err, res, addonName, count, timestamp, results);
+        }
+        var addonId = results[0]._id;
+        collection.insert(
+          {
+            addon_id: addonId,
+            count: count,
+            timestamp: timestamp
+          },
+          { w: 1 },
+          function (err, results) {
+            callback(err, res, addonName, count, timestamp, results);
+          }
+        );
+      }
+    );
+  });
 }
