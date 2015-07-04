@@ -11,6 +11,7 @@ module.exports = {
   getAddon: getAddon,
   getAddonCallback: getAddonCallback, // visible for testing
   createAddon: createAddon,
+  createAddonCallback: createAddonCallback, // visible for testing
   getDownloadsForAddon: getDownloadsForAddon,
   addDownloadsForAddon: addDownloadsForAddon
 };

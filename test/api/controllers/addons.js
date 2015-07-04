@@ -7,7 +7,8 @@ process.env.MONGOLAB_URI = 'mongodb://localhost:27017/testAddonDownloadTracker';
 process.env.A127_ENV = 'test';
 
 var databaseStub = {
-  createConstraintsOnStartup: function() {},
+  createConstraintsOnStartup: function () {
+  },
   lookupAddons: function (res, callback) {
     res.json(['addon1', 'addon2']);
   },
@@ -72,11 +73,11 @@ describe('controllers', function () {
       it('Should throw 500 if error is set', function (done) {
         var err = 'An error!';
         var res = {
-          status: function(statusCode) {
+          status: function (statusCode) {
             statusCode.should.be.exactly(500);
             return this;
           },
-          json: function(message) {
+          json: function (message) {
             message.should.be.exactly('An error occurred while fetching addons, sorry.');
             return this;
           }
@@ -88,7 +89,7 @@ describe('controllers', function () {
       it('Should give an empty JSON object if results are empty', function (done) {
         var results = [];
         var res = {
-          json: function(message) {
+          json: function (message) {
             should.exist(message);
             (message).should.have.keys();
             (message).should.match({});
@@ -102,7 +103,7 @@ describe('controllers', function () {
       it('Should give a JSON object with addonName if at least one result', function (done) {
         var results = [{addonName: 'myAddon', _id: 27, curseForgeUrl: 'foo', wowInterfaceUrl: 'bar'}];
         var res = {
-          json: function(message) {
+          json: function (message) {
             should.exist(message);
             (message).should.have.length(1);
             (message).should.match(['myAddon']);
@@ -135,11 +136,11 @@ describe('controllers', function () {
       it('Should throw 500 if error is set', function (done) {
         var err = 'An error!';
         var res = {
-          status: function(statusCode) {
+          status: function (statusCode) {
             statusCode.should.be.exactly(500);
             return this;
           },
-          json: function(message) {
+          json: function (message) {
             message.should.be.exactly('An error occurred while fetching the addon, sorry.');
             return this;
           }
@@ -151,11 +152,11 @@ describe('controllers', function () {
       it('Should give a 404 if results are empty', function (done) {
         var results = [];
         var res = {
-          status: function(statusCode) {
+          status: function (statusCode) {
             statusCode.should.be.exactly(404);
             return this;
           },
-          json: function(message) {
+          json: function (message) {
             message.should.be.exactly('The requested addon could not be found.');
             return this;
           }
@@ -167,7 +168,7 @@ describe('controllers', function () {
       it('Should give a JSON object with addonName if at least one result', function (done) {
         var results = [{addonName: 'myAddon', _id: 27, curseForgeUrl: 'foo', wowInterfaceUrl: 'bar'}];
         var res = {
-          json: function(message) {
+          json: function (message) {
             should.exist(message);
             (message).should.have.length(1);
             (message).should.match(['myAddon']);
@@ -246,6 +247,41 @@ describe('controllers', function () {
       });
 
       // todo add more tests around bad input, invalid addonNames and URLs, to test input filtering.
+    });
+
+    describe('Callback for POST /addons/foobar', function () {
+      it('Should throw 400 if error is set', function (done) {
+        var res = {
+          status: function (statusCode) {
+            statusCode.should.be.exactly(400);
+            return this;
+          },
+          json: function (message) {
+            message.should.be.exactly('The specified addon already exists: foobar');
+            return this;
+          }
+        };
+        addons.createAddonCallback('An error!', res, 'foobar', null);
+        done();
+      });
+
+      it('Should give a JSON object without _id if a successful result', function (done) {
+        var results = {
+          ops: [
+            {addonName: 'myAddon', _id: 27, curseForgeUrl: 'foo', wowInterfaceUrl: 'bar'}
+          ]
+        };
+        var res = {
+          json: function (addon) {
+            should.exist(addon);
+            addon.should.have.keys('addonName', 'curseForgeUrl', 'wowInterfaceUrl');
+            addon.addonName.should.be.exactly('myAddon');
+            return this;
+          }
+        };
+        addons.createAddonCallback(null, res, 'foobar', results);
+        done();
+      });
     });
 
     describe('GET /addons/foobar/downloads', function () {
