@@ -170,12 +170,12 @@ describe('controllers', function () {
         var res = {
           json: function (message) {
             should.exist(message);
-            (message).should.have.length(1);
-            (message).should.match(['myAddon']);
+            message.should.have.keys('addonName', 'curseForgeUrl', 'wowInterfaceUrl');
+            message.addonName.should.be.exactly('myAddon');
             return this;
           }
         };
-        addons.getAddonsCallback(null, res, results);
+        addons.getAddonCallback(null, res, results);
         done();
       });
     });
