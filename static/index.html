@@ -1,5 +1,38 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <title>Warcraft Addon Download Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="d3.min.js" charset="utf-8"></script>
+    <link href="nv.d3.min.css" rel="stylesheet">
+    <script type="text/javascript" src="nv.d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="moment.min.js" charset="utf-8"></script>
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+
+        svg {
+            display: block;
+        }
+
+        html, body, #chart, svg {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
 <body>
-  <p>Welcome to the Warcraft Addon Download Tracker</p>
+<p>Welcome to the Warcraft Addon Download Tracker</p>
+
+<div id='chart'>
+    <svg></svg>
+</div>
+
+<script type='text/javascript' src="chart.js" charset="utf-8"></script>
 </body>
 </html>
