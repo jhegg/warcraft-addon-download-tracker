@@ -15,13 +15,15 @@ nv.addGraph(function () {
   chart.xAxis
     .axisLabel('Time')
     .tickFormat(function (d) {
-      return d3.time.format('%m-%d-%y %I:%M:%S')(new Date(d));
-    });
+      return d3.time.format('%m-%d-%y')(new Date(d));
+    })
+    .staggerLabels(true);
+  chart.xScale(d3.time.scale());
 
   chart.yAxis
     .axisLabel('Downloads')
     .tickFormat(d3.format(',f'));
-  chart.forceY([0, 1000]);
+  chart.forceY([0, 100]);
 
   d3.json('/addons', function (error, data) {
     if (error) {
