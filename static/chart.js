@@ -6,7 +6,7 @@ var height = 600;
 
 nv.addGraph(function () {
   chart = nv.models.lineChart()
-    .margin({left: 100, bottom: 50, right: 50})
+    .margin({left: 100, bottom: 100, right: 50})
     .useInteractiveGuideline(true)
     .showLegend(true)
     .showYAxis(true)
@@ -50,7 +50,6 @@ function fetchDataForAddon(addonName) {
       return;
     }
 
-    console.log('Fetched download counts for addon: ' + data.addonName);
     var transformedAddonData = data.downloads.map(function (currentValue, index, array) {
       return {
         x: moment(currentValue.timestamp).toDate(),
@@ -58,7 +57,6 @@ function fetchDataForAddon(addonName) {
       };
     });
     addons.push({values: transformedAddonData, key: data.addonName});
-    console.log(addons);
     updateChart();
   });
 }
@@ -91,5 +89,5 @@ function resizeChart() {
   // resize based on container's width AND HEIGHT
   var windowSize = nv.utils.windowSize();
   svg.attr("width", windowSize.width);
-  svg.attr("height", windowSize.height);
+  svg.attr("height", windowSize.height - 100);
 }
