@@ -89,7 +89,8 @@ function lookupDownloadsForAddon(addonName, res, callback) {
         }
         var addonId = results[0]._id;
         collection.find(
-          {'addon_id': addonId}
+          {'addon_id': addonId},
+          {'sort': 'timestamp'}
         ).toArray(
           function (err, results) {
             callback(err, res, addonName, results);
