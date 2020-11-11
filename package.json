@@ -9,8 +9,8 @@
   "main": "app.js",
   "dependencies": {
     "express": "^4.12.3",
-    "swagger-express-mw": "0.0.x",
-    "mongodb": "^2.0.35"
+    "mongodb": "^3.6.3",
+    "swagger-express-mw": "0.0.x"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",

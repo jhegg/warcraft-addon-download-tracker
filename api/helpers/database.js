@@ -15,9 +15,9 @@ module.exports = {
 };
 
 function createConstraints() {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    var collection = db.collection(mongoCollection);
+    const collection = client.db().collection(mongoCollection);
     collection.createIndex('addonName', {unique: true, sparse: true}, function (err, indexName) {
       if (err) console.error('Error while creating addonNameUnique index: ' + err);
       console.log('Created index: ' + indexName);
@@ -26,13 +26,13 @@ function createConstraints() {
 }
 
 function lookupAddons(res, callback) {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    db.collection(mongoCollection).find(
+    const collection = client.db().collection(mongoCollection);
+    collection.find(
       {'addonName': {$exists: true, $ne: null}},
-      {'addonName': true},
-      {'sort': 'addonName'}
-    ).toArray(
+      {'addonName': true}
+    ).sort({addonName: 1}).toArray(
       function (err, results) {
         callback(err, res, results);
       }
@@ -41,9 +41,10 @@ function lookupAddons(res, callback) {
 }
 
 function lookupAddon(addonName, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    db.collection(mongoCollection).find(
+    const collection = client.db().collection(mongoCollection);
+    collection(mongoCollection).find(
       {'addonName': addonName}
     ).toArray(
       function (err, results) {
@@ -54,9 +55,9 @@ function lookupAddon(addonName, res, callback) {
 }
 
 function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    var collection = db.collection(mongoCollection);
+    const collection = client.db().collection(mongoCollection);
     collection.insert(
       {
         addonName: addonName,
@@ -72,9 +73,9 @@ function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
 }
 
 function lookupDownloadsForAddon(addonName, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    var collection = db.collection(mongoCollection);
+    const collection = client.db().collection(mongoCollection);
     collection.find(
       {'addonName': addonName}
     ).toArray(
@@ -89,9 +90,8 @@ function lookupDownloadsForAddon(addonName, res, callback) {
         }
         var addonId = results[0]._id;
         collection.find(
-          {'addon_id': addonId},
-          {'sort': 'timestamp'}
-        ).toArray(
+          {'addon_id': addonId}
+        ).sort({timestamp: 1}).toArray(
           function (err, results) {
             callback(err, res, addonName, results);
           }
@@ -111,9 +111,9 @@ function lookupDownloadsForAddon(addonName, res, callback) {
 }
 
 function newDownloadCountForAddon(addonName, count, timestamp, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, db) {
+  MongoClient.connect(mongoUrl, function (err, client) {
     assert.equal(null, err);
-    var collection = db.collection(mongoCollection);
+    const collection = client.db().collection(mongoCollection);
     collection.find(
       {'addonName': addonName}
     ).toArray(
