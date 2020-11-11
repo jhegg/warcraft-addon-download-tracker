@@ -3,7 +3,7 @@
 var assert = require('assert');
 var MongoClient = require('mongodb').MongoClient;
 var mongoCollection = 'addons';
-var mongoUrl = process.env.MONGOLAB_URI;
+var mongoUrl = process.env.MONGODB_URI;
 
 module.exports = {
   lookupAddons: lookupAddons,
