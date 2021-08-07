@@ -1,22 +1,7 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
-  version: "0.0.1"
+  version: 0.0.1
   title: Warcraft Addon Download Tracker
-# during dev, should point to your local machine
-host: localhost:10010
-# basePath prefixes all resource paths
-basePath: /
-#
-schemes:
-  # tip: remove http to make production-grade
-  - http
-  - https
-# format of bodies a client can send (Content-Type)
-consumes:
-  - application/json
-# format of the responses to the client (Accepts)
-produces:
-  - application/json
 paths:
   /addons:
     x-swagger-router-controller: addons
@@ -25,182 +10,213 @@ paths:
       description: Get the list of addons
       operationId: getAddons
       responses:
-        200:
+        "200":
           description: Success
-          schema:
-            $ref: "#/definitions/addons"
-  /addons/{addonName}:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addons"
+  "/addons/{addonName}":
     x-swagger-router-controller: addons
     get:
       summary: Returns a specific addon
       description: Gets a specific addon
       operationId: getAddon
       responses:
-        200:
+        "200":
           description: Success
-          schema:
-            $ref: "#/definitions/addon"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addon"
         default:
           description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Creates a new addon
       description: Creates an addon
       operationId: createAddon
       parameters:
-        - name: urls
-          in: body
-          description: The addon URLs
-          required: true
-          schema:
-            $ref: '#/definitions/addon_post'
         - name: api-token
           in: header
           description: The API token for authorization
           required: true
-          type: string
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/addon_post"
+        description: The addon URLs
+        required: true
       responses:
-        200:
+        "200":
           description: Success
-          schema:
-            $ref: "#/definitions/addon"
-        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addon"
+        "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     parameters:
-      - $ref: "#/parameters/addonNameParam"
-  /addons/{addonName}/downloads:
+      - $ref: "#/components/parameters/addonNameParam"
+  "/addons/{addonName}/downloads":
     x-swagger-router-controller: addons
     get:
       summary: Returns download information for {addonName}
       description: Get the list of addons
       operationId: getDownloadsForAddon
       responses:
-        200:
+        "200":
           description: Success
-          schema:
-            $ref: "#/definitions/addonDownloads"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addonDownloads"
         default:
           description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Adds a new download count for {addonName}
       operationId: addDownloadsForAddon
       parameters:
-        - name: downloads
-          in: body
-          description: The new download count and timestamp for {addonName}
-          required: true
-          schema:
-            $ref: '#/definitions/addon_downloads_post'
         - name: api-token
           in: header
           description: The API token for authorization
           required: true
-          type: string
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/addon_downloads_post"
+        description: The new download count and timestamp for {addonName}
+        required: true
       responses:
-        200:
+        "200":
           description: Success
-          schema:
-            $ref: "#/definitions/addon_downloads_post_response"
-        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addon_downloads_post_response"
+        "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     parameters:
-      - $ref: "#/parameters/addonNameParam"
-parameters:
-  addonNameParam:
-    name: addonName
-    in: path
-    required: true
-    type: string
-    description: The name of an addon to retrieve data from
-definitions:
-  addon:
-    type: object
-    required:
-      - addonName
-    properties:
-      addonName:
+      - $ref: "#/components/parameters/addonNameParam"
+servers:
+  - url: http://localhost:10010/
+  - url: https://localhost:10010/
+components:
+  parameters:
+    addonNameParam:
+      name: addonName
+      in: path
+      required: true
+      description: The name of an addon to retrieve data from
+      schema:
         type: string
-      curseForgeUrl:
-        type: string
-      wowInterfaceUrl:
-        type: string
-  addon_post:
-    type: object
-    required:
-      - curseForgeUrl
-      - wowInterfaceUrl
-    properties:
-      curseForgeUrl:
-        type: string
-      wowInterfaceUrl:
-        type: string
-  addon_downloads_post:
-    type: object
-    required:
-      - count
-    properties:
-      count:
-        type: integer
-        format: int32
-        minimum: 0
-  addons:
-    properties:
-      message:
-        type: string
-  addonDownloads:
-    required:
-      - addonName
-    type: object
-    properties:
-      addonName:
-        type: string
-      downloads:
-        type: array
-        items:
-          - $ref: "#/definitions/download_count"
-  download_count:
-    type: object
-    required:
-      - count
-      - timestamp
-    properties:
-      count:
-        type: integer
-        format: int32
-      timestamp:
-        type: string
-        format: date-time
-  addon_downloads_post_response:
-    required:
-      - addonName
-      - count
-      - timestamp
-    properties:
-      addonName:
-        type: string
-      count:
-        type: integer
-        format: int32
-        minimum: 0
-      timestamp:
-        type: string
-        format: date-time
-  ErrorResponse:
-    properties:
-      message:
-        type: string
+  schemas:
+    addon:
+      type: object
+      required:
+        - addonName
+      properties:
+        addonName:
+          type: string
+        curseForgeUrl:
+          type: string
+        wowInterfaceUrl:
+          type: string
+    addon_post:
+      type: object
+      required:
+        - curseForgeUrl
+        - wowInterfaceUrl
+      properties:
+        curseForgeUrl:
+          type: string
+        wowInterfaceUrl:
+          type: string
+    addon_downloads_post:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          format: int32
+          minimum: 0
+    addons:
+      properties:
+        message:
+          type: string
+    addonDownloads:
+      required:
+        - addonName
+      type: object
+      properties:
+        addonName:
+          type: string
+        downloads:
+          type: array
+          items:
+            $ref: "#/components/schemas/download_count"
+    download_count:
+      type: object
+      required:
+        - count
+        - timestamp
+      properties:
+        count:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+    addon_downloads_post_response:
+      required:
+        - addonName
+        - count
+        - timestamp
+      properties:
+        addonName:
+          type: string
+        count:
+          type: integer
+          format: int32
+          minimum: 0
+        timestamp:
+          type: string
+          format: date-time
+    ErrorResponse:
+      properties:
+        message:
+          type: string

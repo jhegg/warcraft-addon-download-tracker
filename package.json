@@ -8,16 +8,16 @@
   "license": "MIT",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.12.3",
-    "mongodb": "^3.6.3",
-    "swagger-express-mw": "0.0.x"
+    "express": "^4.17.1",
+    "express-openapi": "^9.1.0",
+    "mongodb": "^4.1.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.17",
     "mocha": "^2.2.5",
     "mocha-lcov-reporter": "0.0.2",
-    "mongoose": "^4.0.6",
+    "mongoose": "^4.13.21",
     "proxyquire": "^1.5.0",
     "should": "^5.2.0",
     "sinon": "^1.15.4",
@@ -27,6 +27,7 @@
     "node": "6.11.1"
   },
   "scripts": {
+    "start": "node app.js",
     "test": "mocha --check-leaks --reporter spec --bail test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot test/",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec test/"

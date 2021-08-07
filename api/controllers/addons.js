@@ -40,7 +40,7 @@ function getAddonsCallback(err, res, results) {
 }
 
 function getAddon(req, res) {
-  var name = req.swagger.params.addonName.value;
+  var name = req.params.addonName;
   database.lookupAddon(name, res, getAddonCallback);
 }
 
@@ -60,9 +60,9 @@ function getAddonCallback(err, res, results) {
 }
 
 function createAddon(req, res) {
-  var name = req.swagger.params.addonName.value;
-  var curseForgeUrl = req.swagger.params.urls.value.curseForgeUrl;
-  var wowInterfaceUrl = req.swagger.params.urls.value.wowInterfaceUrl;
+  var name = req.params.addonName;
+  var curseForgeUrl = req.params.urls.value.curseForgeUrl;
+  var wowInterfaceUrl = req.params.urls.value.wowInterfaceUrl;
   database.newAddon(name, curseForgeUrl, wowInterfaceUrl, res, createAddonCallback);
 }
 
@@ -77,7 +77,7 @@ function createAddonCallback(err, res, name, results) {
 }
 
 function getDownloadsForAddon(req, res) {
-  var name = req.swagger.params.addonName.value;
+  var name = req.params.addonName;
   database.lookupDownloadsForAddon(name, res, getDownloadsForAddonCallback);
 }
 
@@ -102,8 +102,8 @@ function getDownloadsForAddonCallback(err, res, addonName, results) {
 }
 
 function addDownloadsForAddon(req, res) {
-  var name = req.swagger.params.addonName.value;
-  var count = req.swagger.params.downloads.value.count;
+  var name = req.params.addonName;
+  var count = req.params.downloads.value.count;
   var timestamp = new Date();
   database.newDownloadCountForAddon(name, count, timestamp, res, addDownloadsForAddonCallback);
 }

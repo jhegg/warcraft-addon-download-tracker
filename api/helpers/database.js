@@ -1,9 +1,10 @@
 'use strict';
 
-var assert = require('assert');
-var MongoClient = require('mongodb').MongoClient;
-var mongoCollection = 'addons';
-var mongoUrl = process.env.MONGODB_URI;
+const assert = require('assert');
+const {MongoClient} = require('mongodb');
+const mongoCollection = 'addons';
+const mongoUrl = process.env.MONGODB_URI;
+const client = new MongoClient(mongoUrl);
 
 module.exports = {
   lookupAddons: lookupAddons,
@@ -15,7 +16,7 @@ module.exports = {
 };
 
 function createConstraints() {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
     collection.createIndex('addonName', {unique: true, sparse: true}, function (err, indexName) {
@@ -26,7 +27,7 @@ function createConstraints() {
 }
 
 function lookupAddons(res, callback) {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
     collection.find(
@@ -41,10 +42,10 @@ function lookupAddons(res, callback) {
 }
 
 function lookupAddon(addonName, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
-    collection(mongoCollection).find(
+    collection.find(
       {'addonName': addonName}
     ).toArray(
       function (err, results) {
@@ -55,7 +56,7 @@ function lookupAddon(addonName, res, callback) {
 }
 
 function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
     collection.insert(
@@ -73,7 +74,7 @@ function newAddon(addonName, curseForgeUrl, wowInterfaceUrl, res, callback) {
 }
 
 function lookupDownloadsForAddon(addonName, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
     collection.find(
@@ -111,7 +112,7 @@ function lookupDownloadsForAddon(addonName, res, callback) {
 }
 
 function newDownloadCountForAddon(addonName, count, timestamp, res, callback) {
-  MongoClient.connect(mongoUrl, function (err, client) {
+  client.connect(function (err, client) {
     assert.equal(null, err);
     const collection = client.db().collection(mongoCollection);
     collection.find(

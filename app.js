@@ -1,13 +1,16 @@
 'use strict';
 
-var SwaggerExpress = require('swagger-express-mw');
 var express = require('express');
-var app = express();
+var {initialize} = require('express-openapi');
+var http = require('http');
+var addons = require('./api/controllers/addons.js');
+const app = express();
 module.exports = app; // for testing
 
-var config = {
-  appRoot: __dirname // required config
-};
+// var config = {
+//   apiDoc: './swagger/swagger.yaml',
+//   appRoot: __dirname // required config
+// };
 
 // need to handle the index page before registering swagger, or swagger
 // takes it over
@@ -34,17 +37,40 @@ app.use(function(req, res, next) {
   next();
 });
 
-SwaggerExpress.create(config, function(err, swaggerExpress) {
-  if (err) { throw err; }
-
-  // install middleware
-  swaggerExpress.register(app);
-
-  var port = process.env.PORT || 10010;
-  app.listen(port);
-
-  console.log('App now listening on port: ' + port);
+initialize({
+  app,
+  apiDoc: './api/swagger/swagger.yaml',
+  dependencies: {
+    log: console.log
+  },
+  operations: addons
 });
+
+// initialize({
+//   app,
+//   apiDoc: './swagger/swagger.yaml'
+// });
+
+const server = http.createServer(app);
+const PORT = process.env.PORT || 10010;
+server.listen(PORT, (err) => {
+  if (err) {
+    console.error(`server listening error: ${err}`);
+  }
+  console.info('server started');
+});
+
+// SwaggerExpress.create(config, function(err, swaggerExpress) {
+//   if (err) { throw err; }
+
+//   // install middleware
+//   swaggerExpress.register(app);
+
+//   var port = process.env.PORT || 10010;
+//   app.listen(port);
+
+//   console.log('App now listening on port: ' + port);
+// });
 
 // catch-all route for static resources
 app.use('/', express.static(__dirname + '/static'));
