@@ -7,11 +7,6 @@ var addons = require('./api/controllers/addons.js');
 const app = express();
 module.exports = app; // for testing
 
-// var config = {
-//   apiDoc: './swagger/swagger.yaml',
-//   appRoot: __dirname // required config
-// };
-
 // need to handle the index page before registering swagger, or swagger
 // takes it over
 app.get('/', function(req, res) {
@@ -46,11 +41,6 @@ initialize({
   operations: addons
 });
 
-// initialize({
-//   app,
-//   apiDoc: './swagger/swagger.yaml'
-// });
-
 const server = http.createServer(app);
 const PORT = process.env.PORT || 10010;
 server.listen(PORT, (err) => {
@@ -59,18 +49,6 @@ server.listen(PORT, (err) => {
   }
   console.info('server started');
 });
-
-// SwaggerExpress.create(config, function(err, swaggerExpress) {
-//   if (err) { throw err; }
-
-//   // install middleware
-//   swaggerExpress.register(app);
-
-//   var port = process.env.PORT || 10010;
-//   app.listen(port);
-
-//   console.log('App now listening on port: ' + port);
-// });
 
 // catch-all route for static resources
 app.use('/', express.static(__dirname + '/static'));
