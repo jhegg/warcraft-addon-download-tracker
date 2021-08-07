@@ -17,14 +17,14 @@
     "istanbul": "^0.3.17",
     "mocha": "^2.2.5",
     "mocha-lcov-reporter": "0.0.2",
-    "mongoose": "^4.13.21",
+    "mongoose": "^5.7.5",
     "proxyquire": "^1.5.0",
     "should": "^5.2.0",
     "sinon": "^1.15.4",
     "supertest": "^0.15.0"
   },
   "engines": {
-    "node": "6.11.1"
+    "node": "12.16.1"
   },
   "scripts": {
     "start": "node app.js",
